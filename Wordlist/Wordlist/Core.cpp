@@ -1,6 +1,6 @@
 #include "Core.h"
 #include <iostream>
-
+#include <string.h>
 
 Core::Core()
 {
@@ -113,7 +113,46 @@ void Core::bfs_gcw_no_r(char startTail) {
 		}
 	}
 }
-
+void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail) {
+	//update result
+	int currentDist = maxi;
+	char currentChar = maxc;
+	int resultPos = 0;
+	while (currentChar != tail) {
+		if (charNode[currentChar - 'a'].selfLoop) {
+			// have self loop
+			for (int k = 0; k < wnLen; k++) {
+				if (wordNode[k].startChar == currentChar && wordNode[k].endChar == currentChar) {
+					result[resultPos] = wordNode[k].word;
+					resultPos++;
+					currentDist--;
+					break;
+				}
+			}
+		}
+		// now move maxc to next char
+		for (int k = 0; k < wnLen; k++) {
+			if (wordNode[k].startChar == currentChar && charNode[wordNode[k].endChar - 'a'].distanceToTail == currentDist - 1) {
+				result[resultPos] = wordNode[k].word;
+				resultPos++;
+				currentChar = wordNode[k].endChar;
+				currentDist--;
+				break;
+			}
+		}
+	}
+	// add the last one
+	if (charNode[currentChar - 'a'].selfLoop) {
+		// have self loop
+		for (int k = 0; k < wnLen; k++) {
+			if (wordNode[k].startChar == currentChar && wordNode[k].endChar == currentChar) {
+				result[resultPos] = wordNode[k].word;
+				resultPos++;
+				break;
+			}
+		}
+	}
+}
 int Core::gen_chain_word(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
 {
 	int wnLen = 0;
@@ -133,55 +172,25 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		int cl = 0; // a save of current longest path
 		for (int i = 0; i < strlen(resultTails); i++) {
 			bfs_gcw_no_r(resultTails[i]);
-			int maxi = -1; char maxc; maxc = 'a';
-			for (int j = 0; j < 26; j++) {
-				if (charNode[j].distanceToTail > maxi) {
-					maxi = charNode[j].distanceToTail;
-					maxc = charNode[j].endChar;
+			int maxi = -1; char maxc = head;
+			if (head == 0) {
+				for (int j = 0; j < 26; j++) {
+					if (charNode[j].distanceToTail > maxi) {
+						maxi = charNode[j].distanceToTail;
+						maxc = charNode[j].endChar;
+					}
 				}
 			}
+			else {
+				maxi = charNode[head - 'a'].distanceToTail;
+				maxc = head;
+			}
+
 			//get max
 			if (maxi > cl) {
-				//more bigger
 				cl = maxi;
-				//update result
-				int currentDist = maxi;
-				char currentChar = maxc;
-				int resultPos = 0;
-				while (currentChar != resultTails[i]) {
-					if (charNode[currentChar - 'a'].selfLoop) {
-						// have self loop
-						for (int k = 0; k < wnLen; k++) {
-							if (wordNode[k].startChar == currentChar && wordNode[k].endChar == currentChar) {
-								result[resultPos] = wordNode[k].word;
-								resultPos++;
-								currentDist--;
-								break;
-							}
-						}
-					}
-					// now move maxc to next char
-					for (int k = 0; k < wnLen; k++) {
-						if (wordNode[k].startChar == currentChar && charNode[wordNode[k].endChar - 'a'].distanceToTail == currentDist - 1) {
-							result[resultPos] = wordNode[k].word;
-							resultPos++;
-							currentChar = wordNode[k].endChar;
-							currentDist--;
-							break;
-						}
-					}
-				}
-				// add the last one
-				if (charNode[currentChar - 'a'].selfLoop) {
-					// have self loop
-					for (int k = 0; k < wnLen; k++) {
-						if (wordNode[k].startChar == currentChar && wordNode[k].endChar == currentChar) {
-							result[resultPos] = wordNode[k].word;
-							resultPos++;
-							break;
-						}
-					}
-				}
+				//more bigger
+				bfs_get_result(result, wnLen, maxi, maxc, resultTails[i]);
 			}
 		}
 
