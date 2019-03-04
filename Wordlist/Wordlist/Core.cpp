@@ -11,7 +11,7 @@ Core::~Core()
 {
 }
 
-int Core::createMap(char *words[], int len) {
+int Core::create_map(char *words[], int len) {
 	int pos = 0;
 	for (int i = 0; i < len; i++) {
 		char *currentWord;
@@ -56,7 +56,7 @@ int Core::createMap(char *words[], int len) {
 	return pos;
 }
 
-void Core::getTails(int wnLen, char *retTails) {
+void Core::get_tails(int wnLen, char *retTails) {
 	int alpList[26];
 	for (int &i : alpList) {
 		i = -10000000;
@@ -153,16 +153,27 @@ void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char 
 		}
 	}
 }
+void Core::create_dfs_map(char * words[]) {
+
+}
+void Core::visit_node(int id) {
+
+}
+void Core::get_tail_dfs(char* returnTails) {}
+void Core::dfs_gcw_r(int depth) {
+
+	return;
+}
 int Core::gen_chain_word(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
 {
 	int wnLen = 0;
 	if (!enable_loop) {
 		// no loop
-		wnLen = createMap(words, len);
+		wnLen = create_map(words, len);
 		// find the tails to run bfs
-		char resultTails[26];
+		char resultTails[26]; // all possibility of tails
 		if (tail == 0) {
-			getTails(wnLen, resultTails);
+			get_tails(wnLen, resultTails);
 		}
 		else {
 			resultTails[0] = tail;
@@ -195,13 +206,17 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		}
 
 	}
+	else {
+		// -r==True
+		// use DFS for no faster algorithm imaginable currently
+
+	}
 	// Debug Use
 	for (int i = 0; i < 10; i++) {
 		printf("%s\n", result[i]);
 	}
 	return 0;
 }
-
 int Core::gen_chain_char(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
 {
 	return 0;
