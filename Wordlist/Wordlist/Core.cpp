@@ -235,7 +235,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		// no loop
 		wnLen = create_map(words, len);
 		// find the tails to run bfs
-		char resultTails[26]; // all possibility of tails
+		char resultTails[27]; // all possibility of tails
 		if (tail == 0) {
 			get_tails(wnLen, resultTails);
 		}
@@ -275,7 +275,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		// use DFS for no faster algorithm imaginable currently
 		wnLen = create_dfs_map(words, len);
 		// find the tails to run bfs
-		char resultTails[26]; // all possibility of tails
+		char resultTails[27]; // all possibility of tails
 		if (tail == 0) {
 			get_tail_dfs(resultTails);
 		}
@@ -287,7 +287,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 			int route[10000];
 			dfs_gcw_r(0, resultTails[i], route, head);
 		}
-		//printf("%s",resultTails);
+		//printf("%s\n",resultTails);
 		dfs_get_result(result);
 	}
 	// Debug Use
