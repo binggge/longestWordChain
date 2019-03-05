@@ -153,16 +153,80 @@ void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char 
 		}
 	}
 }
-void Core::create_dfs_map(char * words[]) {
+int Core::create_dfs_map(char * words[], int len) {
+	// Notice The map is reversed
+	int wordSidePos = 0;
+	for (int i = 0; i < 26; i++) {
+		mapNode[i].currentChar = (char)(i + 'a');
+	}
+	for (int i = 0; i < len; i++) {
+		char * currentWord = words[i];
+		//add new side
+		wordSide[wordSidePos].startChar = currentWord[0];
+		wordSide[wordSidePos].endChar = currentWord[strlen(currentWord) - 1];
+		wordSide[wordSidePos].word = currentWord;
+		wordSide[wordSidePos].isVisited = false;
+		wordSidePos++;
+		// add side to the node
+		mapNode[currentWord[0] - 'a'].outDegree += 1;
+		mapNode[currentWord[strlen(currentWord) - 1] - 'a'].inDegree += 1;
+		mapNode[currentWord[strlen(currentWord) - 1] - 'a'].nChar[mapNode[currentWord[strlen(currentWord) - 1] - 'a'].ncPos].nextChar = currentWord[0];
+		mapNode[currentWord[strlen(currentWord) - 1] - 'a'].nChar[mapNode[currentWord[strlen(currentWord) - 1] - 'a'].ncPos].wsPointer = wordSidePos - 1;
+		mapNode[currentWord[strlen(currentWord) - 1] - 'a'].ncPos++;
 
+	}
+	return wordSidePos;
 }
-void Core::visit_node(int id) {
-
+void Core::get_tail_dfs(char* returnTails) {
+	int alpList[26];
+	for (int i = 0; i < 26; i++) {
+		alpList[i] = mapNode[i].inDegree - mapNode[i].outDegree;
+	}
+	int pos = 0;
+	for (int i = 0; i < 26; i++) {
+		if (alpList[i] >= 0) {
+			returnTails[pos] = (char)(i + 'a');
+			pos++;
+		}
+	}
+	returnTails[pos] = '\0';
 }
-void Core::get_tail_dfs(char* returnTails) {}
-void Core::dfs_gcw_r(int depth) {
+void Core::dfs_gcw_r(int depth, char currentChar, int route[], char head) {
+	if (depth > maximumLength.length) {
+		// more deep, update
+		if (head == 0) {
+			maximumLength.length = depth;
+			memcpy(maximumLength.route, route, depth * sizeof(int));
+		}
+		else {
+			if (currentChar == head) {
+				maximumLength.length = depth;
+				memcpy(maximumLength.route, route, depth * sizeof(int));
+			}
+		}
 
-	return;
+	}
+	// visit next node
+	for (int i = 0; i < mapNode[currentChar - 'a'].ncPos; i++) {
+		if (wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited) {
+			continue;
+		}
+		// enter next
+		route[depth] = mapNode[currentChar - 'a'].nChar[i].wsPointer;
+		depth += 1;
+		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = true;
+		dfs_gcw_r(depth, mapNode[currentChar - 'a'].nChar[i].nextChar, route, head);
+		// go out
+		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = false;
+		depth -= 1;
+
+	}
+}
+void Core::dfs_get_result(char * result[]) {
+	for (int i = 0; i < maximumLength.length; i++) {
+		int pointer = maximumLength.route[maximumLength.length - i - 1];
+		result[i] = wordSide[pointer].word;
+	}
 }
 int Core::gen_chain_word(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
 {
@@ -209,7 +273,22 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 	else {
 		// -r==True
 		// use DFS for no faster algorithm imaginable currently
-
+		wnLen = create_dfs_map(words, len);
+		// find the tails to run bfs
+		char resultTails[26]; // all possibility of tails
+		if (tail == 0) {
+			get_tail_dfs(resultTails);
+		}
+		else {
+			resultTails[0] = tail;
+			resultTails[1] = '\0';
+		}
+		for (int i = 0; i < strlen(resultTails); i++) {
+			int route[10000];
+			dfs_gcw_r(0, resultTails[i], route, head);
+		}
+		//printf("%s",resultTails);
+		dfs_get_result(result);
 	}
 	// Debug Use
 	for (int i = 0; i < 10; i++) {
@@ -217,6 +296,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 	}
 	return 0;
 }
+
 int Core::gen_chain_char(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
 {
 	return 0;

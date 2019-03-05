@@ -29,22 +29,26 @@ public:
 	} wordSide[10000];
 	struct dfsmapnode {
 		char currentChar;
-		int nextWord[26][100]; // considering change to pointer
+		struct nc {
+			char nextChar; //actually the previous char
+			int wsPointer;
+		} nChar[1000];
+		int ncPos = 0;
 		int inDegree = 0;
 		int outDegree = 0;
 	} mapNode[30];
 	struct maximumlength {
-		int length;
+		int length = 0;
 		int route[1000];
 	} maximumLength;
 	int create_map(char *words[], int len);
 	void get_tails(int wnLen, char *retTails);
 	void bfs_gcw_no_r(char startTail);
 	void bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail);
-	void create_dfs_map(char * words[]);
+	int create_dfs_map(char * words[], int len);
 	void get_tail_dfs(char* returnTails);
-	void visit_node(int id);
-	void dfs_gcw_r(int depth);
+	void dfs_gcw_r(int depth, char currentChar, int route[], char head);
+	void dfs_get_result(char * result[]);
 	int gen_chain_word(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
 	int gen_chain_char(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
 };
