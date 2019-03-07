@@ -4,6 +4,10 @@ class Core
 public:
 	Core();
 	~Core();
+	
+	int gen_chain_word(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
+	int gen_chain_char(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
+private:
 	struct wordnode {
 		char startChar;
 		char endChar;
@@ -49,7 +53,5 @@ public:
 	void get_tail_dfs(char* returnTails);
 	void dfs_gcw_r(int depth, char currentChar, int route[], char head);
 	void dfs_get_result(char * result[]);
-	int gen_chain_word(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
-	int gen_chain_char(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
 };
 
