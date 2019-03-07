@@ -31,7 +31,7 @@ int readFile(char * path) {
 			char * wordBuff = new char[1000];
 			int wordBuffPos = 0;
 			while (isalpha(currentChar) != 0) {
-				wordBuff[wordBuffPos] = currentChar;
+				wordBuff[wordBuffPos] = tolower(currentChar);
 				wordBuffPos++;
 				currentChar = (char)fgetc(fin);
 			}
@@ -192,6 +192,13 @@ int main(int argc, char * argv[]) {
 	if (readAttributes[0]) {
 		core.gen_chain_word(words, len, result, head, tail, hasRound);
 	}
-
+	FILE * fout;
+	int erro = fopen_s(&fout, "solution.txt", "w");
+	int i = 0;
+	while (result[i] != NULL) {
+		fprintf(fout, "%s\n", result[i]);
+		i++;
+	}
+	fclose(fout);
 	return 0;
 }
