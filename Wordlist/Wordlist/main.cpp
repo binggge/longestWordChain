@@ -30,6 +30,7 @@ int readFile(char * path) {
 		if (isalpha(currentChar) != 0) {
 			char * wordBuff = new char[1000];
 			int wordBuffPos = 0;
+			//printf("%c",currentChar);
 			while (isalpha(currentChar) != 0) {
 				wordBuff[wordBuffPos] = tolower(currentChar);
 				wordBuffPos++;
@@ -58,7 +59,12 @@ void roundTest(int len) {
 		i = 0;
 	}
 	for (int i = 0; i < len; i++) {
-		alp[words[i][0] - 'a'][words[i][strlen(words[i]) - 1] - 'a'] = 1;
+		alp[words[i][0] - 'a'][words[i][strlen(words[i]) - 1] - 'a'] += 1;
+	}
+	for (int i = 0; i < 26; i++) {
+		if (alp[i][i] >= 2) {
+			error(11);
+		}
 	}
 	for (int i = 0; i < 26; i++) {
 		int sum = 0;
@@ -187,11 +193,13 @@ int main(int argc, char * argv[]) {
 	if (!readAttributes[0] && !readAttributes[1]) {
 		error(10);
 	}
+	printf("%d", len);
 	Core core;
 	if (!hasRound) roundTest(len);
 	if (readAttributes[0]) {
 		core.gen_chain_word(words, len, result, head, tail, hasRound);
 	}
+	
 	FILE * fout;
 	int erro = fopen_s(&fout, "solution.txt", "w");
 	int i = 0;

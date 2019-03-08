@@ -13,7 +13,7 @@ private:
 		char endChar;
 		char *word;
 		bool selfLoop;
-	} wordNode[1000];
+	} wordNode[10000];
 
 	struct charnode {
 		char endChar;
@@ -24,7 +24,7 @@ private:
 	struct queueitem {
 		char itemChar;
 		int currDist;
-	} bfsQueue[10000];
+	} bfsQueue[20000];
 	struct wordside {
 		char startChar;
 		char endChar;

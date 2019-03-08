@@ -93,12 +93,16 @@ void Core::bfs_gcw_no_r(char startTail) {
 		currDist = bfsQueue[head].currDist;
 		head++;
 		// update distance
+		printf("head%d tail%d\n", head, tail);
 		if (charNode[currChar - 'a'].selfLoop) {
 			currDist += 1;
 		}
 
 		if (currDist > charNode[currChar - 'a'].distanceToTail) {
 			charNode[currChar - 'a'].distanceToTail = currDist;
+		}
+		else {
+			continue;
 		}
 
 		currDist = currDist + 1;
@@ -192,6 +196,7 @@ void Core::get_tail_dfs(char* returnTails) {
 	returnTails[pos] = '\0';
 }
 void Core::dfs_gcw_r(int depth, char currentChar, int route[], char head) {
+	
 	if (depth > maximumLength.length) {
 		// more deep, update
 		if (head == 0) {
@@ -215,6 +220,7 @@ void Core::dfs_gcw_r(int depth, char currentChar, int route[], char head) {
 		route[depth] = mapNode[currentChar - 'a'].nChar[i].wsPointer;
 		depth += 1;
 		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = true;
+		//printf("%d %d %d\n", depth,i, mapNode[currentChar - 'a'].ncPos);
 		dfs_gcw_r(depth, mapNode[currentChar - 'a'].nChar[i].nextChar, route, head);
 		// go out
 		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = false;
@@ -283,11 +289,13 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 			resultTails[0] = tail;
 			resultTails[1] = '\0';
 		}
+		printf("%s\n", resultTails);
 		for (int i = 0; i < strlen(resultTails); i++) {
+			printf("%d\n", i);
 			int route[10000];
 			dfs_gcw_r(0, resultTails[i], route, head);
 		}
-		//printf("%s\n",resultTails);
+		
 		dfs_get_result(result);
 	}
 	// Debug Use
