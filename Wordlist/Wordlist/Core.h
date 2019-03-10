@@ -9,33 +9,33 @@ public:
 	int gen_chain_char(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
 private:
 	struct wordnode {
-		char startChar;
-		char endChar;
-		char *word;
-		bool selfLoop;
+		char startChar='0';
+		char endChar = '0';
+		char *word= new char [10000];
+		bool selfLoop=false;
 	} wordNode[10000];
 
 	struct charnode {
-		char endChar;
-		int reachableChar[26];
-		bool selfLoop;
+		char endChar = '0';
+		int reachableChar[26] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		bool selfLoop=false;
 		int distanceToTail = 0;
 	} charNode[30];
 	struct queueitem {
-		char itemChar;
-		int currDist;
+		char itemChar = '0';
+		int currDist=0;
 	} bfsQueue[20000];
 	struct wordside {
-		char startChar;
-		char endChar;
-		char *word;
+		char startChar = '0';
+		char endChar = '0';
+		char *word = new char[10000];
 		bool isVisited = false;
 	} wordSide[10000];
 	struct dfsmapnode {
-		char currentChar;
+		char currentChar = '0';
 		struct nc {
-			char nextChar; //actually the previous char
-			int wsPointer;
+			char nextChar = '0'; //actually the previous char
+			int wsPointer = 0;
 		} nChar[1000];
 		int ncPos = 0;
 		int inDegree = 0;
@@ -43,7 +43,7 @@ private:
 	} mapNode[30];
 	struct maximumlength {
 		int length = 0;
-		int route[1000];
+		int * route=new int[10000];
 	} maximumLength;
 	int create_map(char *words[], int len);
 	void get_tails(int wnLen, char *retTails);

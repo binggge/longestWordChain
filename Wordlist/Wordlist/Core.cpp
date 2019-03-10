@@ -93,7 +93,7 @@ void Core::bfs_gcw_no_r(char startTail) {
 		currDist = bfsQueue[head].currDist;
 		head++;
 		// update distance
-		printf("head%d tail%d\n", head, tail);
+		//printf("head%d tail%d\n", head, tail);
 		if (charNode[currChar - 'a'].selfLoop) {
 			currDist += 1;
 		}
@@ -234,6 +234,7 @@ void Core::dfs_get_result(char * result[]) {
 		result[i] = wordSide[pointer].word;
 	}
 }
+int route[10000];
 int Core::gen_chain_word(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
 {
 	int wnLen = 0;
@@ -251,7 +252,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		}
 
 		int cl = 0; // a save of current longest path
-		for (int i = 0; i < strlen(resultTails); i++) {
+		for (int i = 0; i < (int)strlen(resultTails); i++) {
 			bfs_gcw_no_r(resultTails[i]);
 			int maxi = -1; char maxc = head;
 			if (head == 0) {
@@ -290,9 +291,9 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 			resultTails[1] = '\0';
 		}
 		printf("%s\n", resultTails);
-		for (int i = 0; i < strlen(resultTails); i++) {
+		for (int i = 0; i < (int)strlen(resultTails); i++) {
 			printf("%d\n", i);
-			int route[10000];
+			
 			dfs_gcw_r(0, resultTails[i], route, head);
 		}
 		

@@ -16,15 +16,20 @@ void error(int e) {
 	if (e == 9) printf("undefined error");
 	if (e == 10) printf("no input file");
 	if (e == 11) printf("has a circle while -r = false");
+	if (e == 12) printf("no word link found");
 	exit(-1);
 }
 char * words[10000];
 int readFile(char * path) {
-	FILE  * fin;
-	int err= fopen_s(&fin,path, "r");
+	/*FILE  * fin = new FILE;
+	int err;
+	err= fopen_s(&fin,path, "r");
 	char currentChar;
-	currentChar = (char)fgetc(fin);
-
+	currentChar = (char)fgetc(fin);*/
+	std::ifstream fin;
+	fin.open(path);
+	char currentChar;
+	currentChar = fin.get();
 	int wordPos = 0;
 	while (currentChar != EOF) {
 		if (isalpha(currentChar) != 0) {
@@ -34,16 +39,17 @@ int readFile(char * path) {
 			while (isalpha(currentChar) != 0) {
 				wordBuff[wordBuffPos] = tolower(currentChar);
 				wordBuffPos++;
-				currentChar = (char)fgetc(fin);
+				currentChar = fin.get();
 			}
 			wordBuff[wordBuffPos] = '\0';
 			words[wordPos] = wordBuff;
 			wordPos++;
 		}
 		else {
-			currentChar = (char)fgetc(fin);
+			currentChar = fin.get();
 		}
 	}
+	fin.close();
 	return wordPos;
 }
 void roundTest(int len) {
@@ -194,19 +200,31 @@ int main(int argc, char * argv[]) {
 		error(10);
 	}
 	printf("%d", len);
-	Core core;
+	Core * core= new Core();
 	if (!hasRound) roundTest(len);
 	if (readAttributes[0]) {
-		core.gen_chain_word(words, len, result, head, tail, hasRound);
+		//for (int i = 0; i < 50; i++) {
+			core->gen_chain_word(words, len, result, head, tail, hasRound);
+		//}
+		
 	}
-	
-	FILE * fout;
-	int erro = fopen_s(&fout, "solution.txt", "w");
+
+	/*FILE * fout = new FILE;
+	int erro = fopen_s(&fout, "solution.txt", "w");*/
+	std::ofstream fout("solution.txt");
 	int i = 0;
 	while (result[i] != NULL) {
-		fprintf(fout, "%s\n", result[i]);
 		i++;
 	}
-	fclose(fout);
+	if (i <= 1) {
+		error(12);
+	}
+	i = 0;
+	while (result[i] != NULL) {
+		//fprintf(fout, "%s\n", result[i]);
+		fout << result[i] << std::endl;
+		i++;
+	}
+	fout.close();
 	return 0;
 }
