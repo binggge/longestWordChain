@@ -14,6 +14,7 @@ private:
 		char *word= new char [10000];
 		bool selfLoop=false;
 	} wordNode[10000];
+	//最大26*26条边
 
 	struct charnode {
 		char endChar = '0';
@@ -21,16 +22,18 @@ private:
 		bool selfLoop=false;
 		int distanceToTail = 0;
 	} charNode[30];
+	//26个字母
+
 	struct queueitem {
 		char itemChar = '0';
 		int currDist=0;
-	} bfsQueue[20000];
+	} bfsQueue[20000]; //BFS队列
 	struct wordside {
 		char startChar = '0';
 		char endChar = '0';
 		char *word = new char[10000];
 		bool isVisited = false;
-	} wordSide[10000];
+	} wordSide[10000]; //DFS边
 	struct dfsmapnode {
 		char currentChar = '0';
 		struct nc {
@@ -40,11 +43,11 @@ private:
 		int ncPos = 0;
 		int inDegree = 0;
 		int outDegree = 0;
-	} mapNode[30];
+	} mapNode[30]; //DFS节点
 	struct maximumlength {
 		int length = 0;
 		int * route=new int[10000];
-	} maximumLength;
+	} maximumLength; //DFS最长路径
 	int create_map(char *words[], int len);
 	void get_tails(int wnLen, char *retTails);
 	void bfs_gcw_no_r(char startTail);
@@ -53,5 +56,6 @@ private:
 	void get_tail_dfs(char* returnTails);
 	void dfs_gcw_r(int depth, char currentChar, int route[], char head);
 	void dfs_get_result(char * result[]);
+	void roundTest(char * words[], int len);
 };
 

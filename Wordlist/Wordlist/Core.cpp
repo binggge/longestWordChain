@@ -10,8 +10,67 @@ Core::Core()
 Core::~Core()
 {
 }
-
+void Core::roundTest(char * words[], int len) {
+	// 判断words有没有环，有环throw exception，用于没有-r的数据
+	// 使用拓扑删点
+	// test if has round
+	int alp[26][26];
+	int inDegree[26];
+	for (auto &i : alp) {
+		for (int &j : i) {
+			j = 0;
+		}
+	}
+	for (int &i : inDegree) {
+		i = 0;
+	}
+	for (int i = 0; i < len; i++) {
+		alp[words[i][0] - 'a'][words[i][strlen(words[i]) - 1] - 'a'] += 1;
+	}
+	for (int i = 0; i < 26; i++) {
+		if (alp[i][i] >= 2) {
+			throw "Find a loop but no -r";
+		}
+	}
+	for (int i = 0; i < 26; i++) {
+		int sum = 0;
+		for (int j = 0; j < 26; j++) {
+			if (alp[j][i] != 0 && i != j) sum++;
+		}
+		inDegree[i] = sum;
+	}
+	int pos = -1;
+	for (int i = 0; i < 26; i++) {
+		if (inDegree[i] == 0) {
+			pos = i;
+			break;
+		}
+	}
+	while (pos != -1) {
+		// remove all pos
+		inDegree[pos] = -1000;
+		for (int i = 0; i < 26; i++) {
+			if (alp[pos][i] != 0) {
+				inDegree[i] -= 1;
+			}
+		}
+		pos = -1;
+		for (int i = 0; i < 26; i++) {
+			if (inDegree[i] == 0) {
+				pos = i;
+				break;
+			}
+		}
+	}
+	bool flag = false;
+	for (int i : inDegree) {
+		if (i > 0) flag = true;
+	}
+	if (flag) throw "Find a loop but no -r";
+}
 int Core::create_map(char *words[], int len) {
+	// 创建BFS图，反向链接，有重边的情况只保留一条，保存边到wordNode，点到charnode，返回总边数（重边算一条）
+	// 倒着建图，搜索快，DFS也一样，原因未知
 	int pos = 0;
 	for (int i = 0; i < len; i++) {
 		char *currentWord;
@@ -57,6 +116,8 @@ int Core::create_map(char *words[], int len) {
 }
 
 void Core::get_tails(int wnLen, char *retTails) {
+	// 得到BFS搜索可能的所有起始节点，因为有些不可能是单词链起点或终点，降低复杂度。
+	// 保存结果到retTails
 	int alpList[26];
 	for (int &i : alpList) {
 		i = -10000000;
@@ -81,6 +142,7 @@ void Core::get_tails(int wnLen, char *retTails) {
 }
 
 void Core::bfs_gcw_no_r(char startTail) {
+	// BFS更新每个点到搜索起点的最长距离，搜索起点是startTail（从尾往头倒序搜索），更新到charNode中
 	int head = 0, tail = 0;
 	int currDist = 0;
 	// init startup
@@ -93,7 +155,6 @@ void Core::bfs_gcw_no_r(char startTail) {
 		currDist = bfsQueue[head].currDist;
 		head++;
 		// update distance
-		//printf("head%d tail%d\n", head, tail);
 		if (charNode[currChar - 'a'].selfLoop) {
 			currDist += 1;
 		}
@@ -118,6 +179,8 @@ void Core::bfs_gcw_no_r(char startTail) {
 	}
 }
 void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail) {
+	// 从更新过的bfs图中找出最长链，更新到result中
+	// maxc是当前字母，maxi是当前距离tail的距离
 	//update result
 	int currentDist = maxi;
 	char currentChar = maxc;
@@ -158,6 +221,7 @@ void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char 
 	}
 }
 int Core::create_dfs_map(char * words[], int len) {
+	//创建DFS图，wordside是边，mapNode是节点，返回总边数
 	// Notice The map is reversed
 	int wordSidePos = 0;
 	for (int i = 0; i < 26; i++) {
@@ -182,6 +246,8 @@ int Core::create_dfs_map(char * words[], int len) {
 	return wordSidePos;
 }
 void Core::get_tail_dfs(char* returnTails) {
+	// 得到DFS搜索可能的所有起始节点。和BFS的应该不通用。
+	// 保存结果到returnTails
 	int alpList[26];
 	for (int i = 0; i < 26; i++) {
 		alpList[i] = mapNode[i].inDegree - mapNode[i].outDegree;
@@ -196,7 +262,7 @@ void Core::get_tail_dfs(char* returnTails) {
 	returnTails[pos] = '\0';
 }
 void Core::dfs_gcw_r(int depth, char currentChar, int route[], char head) {
-	
+	// DFS搜树， 保存最长路径到route 倒着建图倒着搜
 	if (depth > maximumLength.length) {
 		// more deep, update
 		if (head == 0) {
@@ -229,6 +295,7 @@ void Core::dfs_gcw_r(int depth, char currentChar, int route[], char head) {
 	}
 }
 void Core::dfs_get_result(char * result[]) {
+	// 把路径解析成单词链并保存到result
 	for (int i = 0; i < maximumLength.length; i++) {
 		int pointer = maximumLength.route[maximumLength.length - i - 1];
 		result[i] = wordSide[pointer].word;
@@ -239,6 +306,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 {
 	int wnLen = 0;
 	if (!enable_loop) {
+		roundTest(words, len);
 		// no loop
 		wnLen = create_map(words, len);
 		// find the tails to run bfs
@@ -271,7 +339,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 			//get max
 			if (maxi > cl) {
 				cl = maxi;
-				//more bigger
+				//more bigger, update
 				bfs_get_result(result, wnLen, maxi, maxc, resultTails[i]);
 			}
 		}
@@ -299,9 +367,17 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		
 		dfs_get_result(result);
 	}
-	// Debug Use
-	for (int i = 0; i < 10; i++) {
-		printf("%s\n", result[i]);
+	int i = 0;
+	while (result[i] != NULL) {
+		i++;
+	}
+	if (i <= 1) {
+		if (len == 0) {
+			throw "Input file is empty";
+		}
+		else {
+			throw "No chains found";
+		}
 	}
 	return 0;
 }
