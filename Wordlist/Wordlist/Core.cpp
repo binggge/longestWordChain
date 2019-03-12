@@ -72,9 +72,9 @@ int Core::create_map(char *words[], int len) {
 	// 创建BFS图，反向链接，有重边的情况只保留一条，保存边到wordNode，点到charnode，返回总边数（重边算一条）
 	// 倒着建图，搜索快，DFS也一样，原因未知
 	int pos = 0;
-	for (int i = 0; i < len; i++) {
-		char *currentWord;
-		char startChar, endChar;
+	for (int i = 0; i < len; i++) {//遍历所有单词
+		char *currentWord;//当前单词
+		char startChar, endChar;//当前单词首尾字母
 		currentWord = words[i];
 		startChar = currentWord[0];
 		endChar = currentWord[strlen(currentWord) - 1];
@@ -125,10 +125,10 @@ void Core::get_tails(int wnLen, char *retTails) {
 	for (int i = 0; i < wnLen; i++) {
 		alpList[wordNode[i].endChar - 'a'] = 0;
 
-	}
+	}//所有可能为结尾的字母置零
 	for (int i = 0; i < wnLen; i++) {
 		if (!wordNode[i].selfLoop) {
-			alpList[wordNode[i].startChar - 'a'] += 1;
+			alpList[wordNode[i].startChar - 'a'] += 1;//？
 		}
 	}
 	int pos = 0;
@@ -311,7 +311,8 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		wnLen = create_map(words, len);
 		// find the tails to run bfs
 		char resultTails[27]; // all possibility of tails
-		if (tail == 0) {
+		//我们的搜索是从尾部开始的，所以要选择出合适的尾部字母，有的字母不太合适直接舍去，提高效率
+		if (tail == 0) {//无限制尾字母
 			get_tails(wnLen, resultTails);
 		}
 		else {
@@ -384,5 +385,9 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 
 int Core::gen_chain_char(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
 {
+	if (!enable_loop)
+	{
+		roundTest(words, len);
+	}
 	return 0;
 }
