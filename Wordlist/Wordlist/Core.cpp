@@ -128,7 +128,7 @@ void Core::get_tails(int wnLen, char *retTails) {
 	}//所有可能为结尾的字母置零
 	for (int i = 0; i < wnLen; i++) {
 		if (!wordNode[i].selfLoop) {
-			alpList[wordNode[i].startChar - 'a'] += 1;//？
+			alpList[wordNode[i].startChar - 'a'] += 1;//统计每个点的出度，其中自环不计入出度
 		}
 	}
 	int pos = 0;
@@ -137,7 +137,7 @@ void Core::get_tails(int wnLen, char *retTails) {
 			retTails[pos] = (char)(i + 'a');
 			pos++;
 		}
-	}
+	} // 统计所有出度为0的字母，它们可能是尾
 	retTails[pos] = '\0';
 }
 
@@ -157,14 +157,14 @@ void Core::bfs_gcw_no_r(char startTail) {
 		// update distance
 		if (charNode[currChar - 'a'].selfLoop) {
 			currDist += 1;
-		}
+		} // 如果有自环一定走，相当于距离+1
 
 		if (currDist > charNode[currChar - 'a'].distanceToTail) {
 			charNode[currChar - 'a'].distanceToTail = currDist;
 		}
 		else {
 			continue;
-		}
+		} //对于一个字母如果多次访问到，后访问的路径的长小于之前的保存值则剪枝
 
 		currDist = currDist + 1;
 
@@ -174,7 +174,7 @@ void Core::bfs_gcw_no_r(char startTail) {
 				bfsQueue[tail].itemChar = (char)(i + 'a');
 				bfsQueue[tail].currDist = currDist;
 				tail++;
-			}
+			} //添加能走到的节点到队里
 		}
 	}
 }
@@ -194,9 +194,9 @@ void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char 
 					resultPos++;
 					currentDist--;
 					break;
-				}
+				} //从wordside中找到对应的边，输出
 			}
-		}
+		}//有自环，maxi-2 其他-1
 		// now move maxc to next char
 		for (int k = 0; k < wnLen; k++) {
 			if (wordNode[k].startChar == currentChar && charNode[wordNode[k].endChar - 'a'].distanceToTail == currentDist - 1) {
@@ -205,7 +205,7 @@ void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char 
 				currentChar = wordNode[k].endChar;
 				currentDist--;
 				break;
-			}
+			}//从wordside中找到对应的边，输出
 		}
 	}
 	// add the last one
@@ -217,7 +217,7 @@ void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char 
 				resultPos++;
 				break;
 			}
-		}
+		} //最后一个字母如果有自环要走一下，上面while里走不到
 	}
 }
 int Core::create_dfs_map(char * words[], int len) {
@@ -251,13 +251,13 @@ void Core::get_tail_dfs(char* returnTails) {
 	int alpList[26];
 	for (int i = 0; i < 26; i++) {
 		alpList[i] = mapNode[i].inDegree - mapNode[i].outDegree;
-	}
+	} //统计一个点的入度出度差
 	int pos = 0;
 	for (int i = 0; i < 26; i++) {
 		if (alpList[i] >= 0) {
 			returnTails[pos] = (char)(i + 'a');
 			pos++;
-		}
+		} //入读>=出度才可能是结尾字符
 	}
 	returnTails[pos] = '\0';
 }
@@ -274,7 +274,7 @@ void Core::dfs_gcw_r(int depth, char currentChar, int route[], char head) {
 				maximumLength.length = depth;
 				memcpy(maximumLength.route, route, depth * sizeof(int));
 			}
-		}
+		} //对于指定head的情况，走到head才更新路径，其他情况只要路径变长就更新
 
 	}
 	// visit next node
@@ -282,7 +282,7 @@ void Core::dfs_gcw_r(int depth, char currentChar, int route[], char head) {
 		if (wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited) {
 			continue;
 		}
-		// enter next
+		// enter next node
 		route[depth] = mapNode[currentChar - 'a'].nChar[i].wsPointer;
 		depth += 1;
 		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = true;
@@ -320,11 +320,11 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 			resultTails[1] = '\0';
 		}
 
-		int cl = 0; // a save of current longest path
-		for (int i = 0; i < (int)strlen(resultTails); i++) {
+		int cl = 0; // 保存最长路径长度
+		for (int i = 0; i < (int)strlen(resultTails); i++) { //对于可能的tail遍历一遍搜索
 			bfs_gcw_no_r(resultTails[i]);
-			int maxi = -1; char maxc = head;
-			if (head == 0) {
+			int maxi = -1; char maxc = head; // maxi：当前尾字母最长路径长度， maxc当前路径的首字母
+			if (head == 0) {// 便利所有字母，找最远的
 				for (int j = 0; j < 26; j++) {
 					if (charNode[j].distanceToTail > maxi) {
 						maxi = charNode[j].distanceToTail;
@@ -332,7 +332,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 					}
 				}
 			}
-			else {
+			else {//指定首字母
 				maxi = charNode[head - 'a'].distanceToTail;
 				maxc = head;
 			}
@@ -352,7 +352,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		wnLen = create_dfs_map(words, len);
 		// find the tails to run bfs
 		char resultTails[27]; // all possibility of tails
-		if (tail == 0) {
+		if (tail == 0) {// 删去不合适的尾，同上
 			get_tail_dfs(resultTails);
 		}
 		else {
@@ -360,19 +360,19 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 			resultTails[1] = '\0';
 		}
 		printf("%s\n", resultTails);
-		for (int i = 0; i < (int)strlen(resultTails); i++) {
+		for (int i = 0; i < (int)strlen(resultTails); i++) { //遍历可能的尾
 			printf("%d\n", i);
 			
-			dfs_gcw_r(0, resultTails[i], route, head);
+			dfs_gcw_r(0, resultTails[i], route, head);//这里我们直接把路径保存到类变量里，走新的尾时不需要清除上次走的最长路径。
 		}
 		
 		dfs_get_result(result);
 	}
 	int i = 0;
-	while (result[i] != NULL) {
+	while (result[i] != NULL) {//统计result长度
 		i++;
 	}
-	if (i <= 1) {
+	if (i <= 1) { //抛出异常
 		if (len == 0) {
 			throw "Input file is empty";
 		}
