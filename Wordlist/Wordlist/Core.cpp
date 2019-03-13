@@ -333,6 +333,16 @@ void Core::char_bfs_get_result(char * result[], int wnLen, int maxi, char maxc, 
 			}//从wordside中找到对应的边，输出
 		}
 	}
+	if (charNode[currentChar - 'a'].selfLoop) {
+		// have self loop
+		for (int k = 0; k < wnLen; k++) {
+			if (wordNode[k].startChar == currentChar && wordNode[k].endChar == currentChar) {
+				result[resultPos] = wordNode[k].word;
+				resultPos++;
+				break;
+			}
+		} //最后一个字母如果有自环要走一下，上面while里走不到
+	}
 }
 int Core::create_dfs_map(char * words[], int len) {
 	//创建DFS图，wordside是边，mapNode是节点，返回总边数
@@ -358,6 +368,10 @@ int Core::create_dfs_map(char * words[], int len) {
 
 	}
 	return wordSidePos;
+}
+int Core::char_create_dfs_map(char * words[], int len)
+{
+	return 0;
 }
 void Core::get_tail_dfs(char* returnTails) {
 	// 得到DFS搜索可能的所有起始节点。和BFS的应该不通用。
@@ -408,12 +422,51 @@ void Core::dfs_gcw_r(int depth, char currentChar, int route[], char head) {
 
 	}
 }
+void Core::dfs_gcc_r(int depth, char currentChar, int route[], char head)
+{
+	if (tempLength > longestLength) {
+		// more deep, update
+		if (head == 0) {
+			longestLength = tempLength;
+			maximumLength.length = depth;
+			memcpy(maximumLength.route, route, depth * sizeof(int));
+		}
+		else {
+			if (currentChar == head) {
+				longestLength = tempLength;
+				maximumLength.length = depth;
+				memcpy(maximumLength.route, route, depth * sizeof(int));
+			}
+		} //对于指定head的情况，走到head才更新路径，其他情况只要路径变长就更新
+
+	}
+	for (int i = 0; i < mapNode[currentChar - 'a'].ncPos; i++) {
+		if (wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited) {
+			continue;
+		}
+		// enter next node
+		route[depth] = mapNode[currentChar - 'a'].nChar[i].wsPointer;
+		depth += 1;
+		tempLength += strlen(wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].word);
+		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = true;
+		//printf("%d %d %d\n", depth,i, mapNode[currentChar - 'a'].ncPos);
+		dfs_gcw_r(depth, mapNode[currentChar - 'a'].nChar[i].nextChar, route, head);
+		// go out
+		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = false;
+		tempLength -= strlen(wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].word);
+		depth -= 1;
+	}
+}
 void Core::dfs_get_result(char * result[]) {
 	// 把路径解析成单词链并保存到result
 	for (int i = 0; i < maximumLength.length; i++) {
 		int pointer = maximumLength.route[maximumLength.length - i - 1];
 		result[i] = wordSide[pointer].word;
 	}
+}
+void Core::char_dfs_get_result(char * result[])
+{
+
 }
 int route[10000];
 int Core::gen_chain_word(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
@@ -537,7 +590,18 @@ int Core::gen_chain_char(char * words[], int len, char * result[], char head, ch
 	}
 	else
 	{
-
+		wordNum = create_dfs_map(words, len);
+		if (tail != 0)
+		{
+			resultTails[0] = tail;
+			resultTails[1] = '\0';
+		}
+		int length = 0;
+		for (int i = 0; i < strlen(resultTails); i++)
+		{
+			dfs_gcc_r(0, resultTails[i], route, head);//这里我们直接把路径保存到类变量里，走新的尾时不需要清除上次走的最长路径。
+		}
+		dfs_get_result(result);
 	}
 	int i = 0;
 	while (result[i] != NULL) {//统计result长度

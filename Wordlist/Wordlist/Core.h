@@ -48,6 +48,8 @@ private:
 		int length = 0;
 		int * route=new int[10000];
 	} maximumLength; //DFS×î³¤Â·¾¶
+	int longestLength = 0;
+	int tempLength = 0;
 	int create_map(char *words[], int len);
 	int createMapChar(char *words[], int len);
 	void get_tails(int wnLen, char *retTails);
@@ -57,9 +59,15 @@ private:
 	void char_bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail);
 
 	int create_dfs_map(char * words[], int len);
+	int char_create_dfs_map(char * words[], int len);
+
 	void get_tail_dfs(char* returnTails);
 	void dfs_gcw_r(int depth, char currentChar, int route[], char head);
+	void dfs_gcc_r(int depth, char currentChar, int route[], char head);
+
 	void dfs_get_result(char * result[]);
+	void char_dfs_get_result(char * result[]);
+
 	void roundTest(char * words[], int len);
 };
 
