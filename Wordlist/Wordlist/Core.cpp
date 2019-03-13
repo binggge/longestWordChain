@@ -143,14 +143,25 @@ int Core::createMapChar(char * words[], int len)
 			wordNode[wordNum].startChar = startChar;
 			wordNode[wordNum].endChar = endChar;
 			wordNode[wordNum].word = currentWord;
-			if (startChar == endChar) 
+			if (startChar == endChar)
+			{
 				wordNode[wordNum].selfLoop = true;
+				charNode[endChar - 'a'].selfLoop = true;
+			}
+
 			else
+			{
 				wordNode[wordNum].selfLoop = false;
+				charNode[endChar - 'a'].reachableChar[startChar - 'a'] = 1;
+			}
 			wordNum++;
 		}
 	}
-
+	// to update charNode
+	for (int i = 0; i < 26; i++) {
+		charNode[i].endChar = (char)(i + 'a');
+		charNode[i].distanceToTail = -1000;
+	}
 	return wordNum;
 }
 
@@ -424,9 +435,23 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 
 int Core::gen_chain_char(char * words[], int len, char * result[], char head, char tail, bool enable_loop)
 {
+	int wordNum = 0;
+	char resultTails[27] = "abcdefghijklmnopqrstuvwxyz";
 	if (!enable_loop)
 	{
 		roundTest(words, len);
+		wordNum = createMapChar(words, len);
+		if (tail == 0)
+		{
+			for (auto &a : resultTails)
+			{
+
+			}
+		}
+		else
+		{
+
+		}
 	}
 	else
 	{
