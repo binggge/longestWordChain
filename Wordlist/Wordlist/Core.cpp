@@ -115,6 +115,45 @@ int Core::create_map(char *words[], int len) {
 	return pos;
 }
 
+int Core::createMapChar(char * words[], int len)
+{
+	int wordNum = 0;
+	for (int i = 0; i < len; i++)
+	{
+		char *currentWord;//当前单词
+		char startChar, endChar;//当前单词首尾字母
+		int curlen;
+		
+		currentWord = words[i];
+		curlen = strlen(currentWord);
+		startChar = currentWord[0];
+		endChar = currentWord[strlen(currentWord) - 1];
+		bool flag = false;
+		for (int j = 0; j < wordNum; j++) {
+			if (wordNode[j].startChar == startChar && wordNode[j].endChar == endChar) {
+				if (strlen(wordNode[j].word) < curlen)
+				{
+					wordNode[j].word = currentWord;
+				}
+				flag = true;
+				break;
+			}
+		}
+		if (!flag) {
+			wordNode[wordNum].startChar = startChar;
+			wordNode[wordNum].endChar = endChar;
+			wordNode[wordNum].word = currentWord;
+			if (startChar == endChar) 
+				wordNode[wordNum].selfLoop = true;
+			else
+				wordNode[wordNum].selfLoop = false;
+			wordNum++;
+		}
+	}
+
+	return wordNum;
+}
+
 void Core::get_tails(int wnLen, char *retTails) {
 	// 得到BFS搜索可能的所有起始节点，因为有些不可能是单词链起点或终点，降低复杂度。
 	// 保存结果到retTails
@@ -388,6 +427,22 @@ int Core::gen_chain_char(char * words[], int len, char * result[], char head, ch
 	if (!enable_loop)
 	{
 		roundTest(words, len);
+	}
+	else
+	{
+
+	}
+	int i = 0;
+	while (result[i] != NULL) {//统计result长度
+		i++;
+	}
+	if (i <= 1) { //抛出异常
+		if (len == 0) {
+			throw "Input file is empty";
+		}
+		else {
+			throw "No chains found";
+		}
 	}
 	return 0;
 }

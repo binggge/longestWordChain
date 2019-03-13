@@ -49,6 +49,7 @@ private:
 		int * route=new int[10000];
 	} maximumLength; //DFS×î³¤Â·¾¶
 	int create_map(char *words[], int len);
+	int createMapChar(char *words[], int len);
 	void get_tails(int wnLen, char *retTails);
 	void bfs_gcw_no_r(char startTail);
 	void bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail);
