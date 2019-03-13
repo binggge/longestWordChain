@@ -307,6 +307,32 @@ void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char 
 }
 void Core::char_bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail)
 {
+	int currentDist = maxi;
+	char currentChar = maxc;
+	int resultPos = 0;
+	while (currentChar != tail) {
+		if (charNode[currentChar - 'a'].selfLoop) {
+			// have self loop
+			for (int k = 0; k < wnLen; k++) {
+				if (wordNode[k].startChar == currentChar && wordNode[k].endChar == currentChar) {
+					result[resultPos] = wordNode[k].word;
+					resultPos++;
+					currentDist -= strlen(wordNode[k].word);
+					break;
+				} //从wordside中找到对应的边，输出
+			}
+		}//有自环，maxi-2 其他-1
+		// now move maxc to next char
+		for (int k = 0; k < wnLen; k++) {
+			if (wordNode[k].startChar == currentChar && charNode[wordNode[k].endChar - 'a'].distanceToTail == currentDist - strlen(wordNode[k].word)) {
+				result[resultPos] = wordNode[k].word;
+				resultPos++;
+				currentChar = wordNode[k].endChar;
+				currentDist -= strlen(wordNode[k].word);
+				break;
+			}//从wordside中找到对应的边，输出
+		}
+	}
 }
 int Core::create_dfs_map(char * words[], int len) {
 	//创建DFS图，wordside是边，mapNode是节点，返回总边数
@@ -505,7 +531,7 @@ int Core::gen_chain_char(char * words[], int len, char * result[], char head, ch
 			if (maxi > length) {
 				length = maxi;
 				//more bigger, update
-				bfs_get_result(result, wordNum, maxi, maxc, resultTails[i]);
+				char_bfs_get_result(result, wordNum, maxi, maxc, resultTails[i]);
 			}
 		}
 	}
