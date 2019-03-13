@@ -134,6 +134,7 @@ int Core::createMapChar(char * words[], int len)
 				if (strlen(wordNode[j].word) < curlen)
 				{
 					wordNode[j].word = currentWord;
+					reachDistance[endChar - 'a'][startChar - 'a'] = curlen;
 				}
 				flag = true;
 				break;
@@ -143,6 +144,7 @@ int Core::createMapChar(char * words[], int len)
 			wordNode[wordNum].startChar = startChar;
 			wordNode[wordNum].endChar = endChar;
 			wordNode[wordNum].word = currentWord;
+			reachDistance[endChar - 'a'][startChar - 'a'] = curlen;
 			if (startChar == endChar)
 			{
 				wordNode[wordNum].selfLoop = true;
@@ -228,6 +230,39 @@ void Core::bfs_gcw_no_r(char startTail) {
 		}
 	}
 }
+void Core::bfs_gcc_no_r(char startTail)
+{
+	int head = 0, tail = 0;
+	int currDist = 0;
+	// init startup
+	bfsQueue[0].itemChar = startTail;
+	bfsQueue[0].currDist = 0;
+	tail++;
+	while (head != tail)
+	{
+		char currChar = bfsQueue[head].itemChar;
+		currDist = bfsQueue[head].currDist;
+		head++;
+		int tempindex = currChar - 'a';
+		if (charNode[tempindex].selfLoop) {
+			currDist += reachDistance[tempindex][tempindex];
+		}
+		if (currDist > charNode[tempindex].distanceToTail) {
+			charNode[tempindex].distanceToTail = currDist;
+		}
+		else
+		{
+			continue;
+		}
+		for (int i = 0; i < 26; i++) {
+			if (charNode[tempindex].reachableChar[i] == 1) {
+				bfsQueue[tail].itemChar = (char)(i + 'a');
+				bfsQueue[tail].currDist = currDist + reachDistance[tempindex][i];
+				tail++;
+			} //添加能走到的节点到队里
+		}
+	}
+}
 void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail) {
 	// 从更新过的bfs图中找出最长链，更新到result中
 	// maxc是当前字母，maxi是当前距离tail的距离
@@ -269,6 +304,9 @@ void Core::bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char 
 			}
 		} //最后一个字母如果有自环要走一下，上面while里走不到
 	}
+}
+void Core::char_bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail)
+{
 }
 int Core::create_dfs_map(char * words[], int len) {
 	//创建DFS图，wordside是边，mapNode是节点，返回总边数
@@ -441,16 +479,34 @@ int Core::gen_chain_char(char * words[], int len, char * result[], char head, ch
 	{
 		roundTest(words, len);
 		wordNum = createMapChar(words, len);
-		if (tail == 0)
+		if (tail != 0)
 		{
-			for (auto &a : resultTails)
-			{
-
-			}
+			resultTails[0] = tail;
+			resultTails[1] = '\0';
 		}
-		else
+		int length = 0;
+		for (int i = 0; i < strlen(resultTails); i++)
 		{
-
+			bfs_gcc_no_r(resultTails[i]);
+			int maxi = -1; 
+			char maxc = head; // maxi：当前尾字母最长路径长度， maxc当前路径的首字母
+			if (head == 0) {// 遍历所有字母，找最远的
+				for (int j = 0; j < 26; j++) {
+					if (charNode[j].distanceToTail > maxi) {
+						maxi = charNode[j].distanceToTail;
+						maxc = charNode[j].endChar;
+					}
+				}
+			}
+			else {
+				maxi = charNode[head - 'a'].distanceToTail;
+				maxc = head;
+			}
+			if (maxi > length) {
+				length = maxi;
+				//more bigger, update
+				bfs_get_result(result, wordNum, maxi, maxc, resultTails[i]);
+			}
 		}
 	}
 	else

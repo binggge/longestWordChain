@@ -23,7 +23,7 @@ private:
 		int distanceToTail = 0;
 	} charNode[30];
 	//26¸ö×ÖÄ¸
-
+	int reachDistance[26][26] = { 0 };
 	struct queueitem {
 		char itemChar = '0';
 		int currDist=0;
@@ -52,7 +52,10 @@ private:
 	int createMapChar(char *words[], int len);
 	void get_tails(int wnLen, char *retTails);
 	void bfs_gcw_no_r(char startTail);
+	void bfs_gcc_no_r(char startTail);
 	void bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail);
+	void char_bfs_get_result(char * result[], int wnLen, int maxi, char maxc, char tail);
+
 	int create_dfs_map(char * words[], int len);
 	void get_tail_dfs(char* returnTails);
 	void dfs_gcw_r(int depth, char currentChar, int route[], char head);
