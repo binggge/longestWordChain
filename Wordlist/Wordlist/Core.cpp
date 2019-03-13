@@ -324,7 +324,7 @@ int Core::gen_chain_word(char * words[], int len, char * result[], char head, ch
 		for (int i = 0; i < (int)strlen(resultTails); i++) { //对于可能的tail遍历一遍搜索
 			bfs_gcw_no_r(resultTails[i]);
 			int maxi = -1; char maxc = head; // maxi：当前尾字母最长路径长度， maxc当前路径的首字母
-			if (head == 0) {// 便利所有字母，找最远的
+			if (head == 0) {// 遍历所有字母，找最远的
 				for (int j = 0; j < 26; j++) {
 					if (charNode[j].distanceToTail > maxi) {
 						maxi = charNode[j].distanceToTail;
