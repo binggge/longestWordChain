@@ -450,7 +450,7 @@ void Core::dfs_gcc_r(int depth, char currentChar, int route[], char head)
 		tempLength += strlen(wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].word);
 		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = true;
 		//printf("%d %d %d\n", depth,i, mapNode[currentChar - 'a'].ncPos);
-		dfs_gcw_r(depth, mapNode[currentChar - 'a'].nChar[i].nextChar, route, head);
+		dfs_gcc_r(depth, mapNode[currentChar - 'a'].nChar[i].nextChar, route, head);
 		// go out
 		wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].isVisited = false;
 		tempLength -= strlen(wordSide[mapNode[currentChar - 'a'].nChar[i].wsPointer].word);
@@ -591,12 +591,16 @@ int Core::gen_chain_char(char * words[], int len, char * result[], char head, ch
 	else
 	{
 		wordNum = create_dfs_map(words, len);
-		if (tail != 0)
-		{
+		if (tail == 0) {// 删去不合适的尾，同上
+			get_tail_dfs(resultTails);
+		}
+		else {
 			resultTails[0] = tail;
 			resultTails[1] = '\0';
 		}
 		int length = 0;
+
+		printf("%s\n", resultTails);
 		for (int i = 0; i < (int)strlen(resultTails); i++)
 		{
 			dfs_gcc_r(0, resultTails[i], route, head);//这里我们直接把路径保存到类变量里，走新的尾时不需要清除上次走的最长路径。

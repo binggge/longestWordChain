@@ -17,6 +17,7 @@ void error(int e) {
 	if (e == 10) throw "no input file";
 	if (e == 11) throw "has a circle while -r = false";
 	if (e == 12) throw "no word link found";
+	if (e == 14) throw "wrong format, not *.txt";
 }
 char * words[10000];
 int readFile(char * path) {
@@ -68,6 +69,9 @@ int main(int argc, char * argv[]) {
 				posInArgc++;
 				char * readPath = argv[posInArgc];
 				posInArgc++;
+				if (readPath[strlen(readPath)-1] != 't' || readPath[strlen(readPath) - 2] != 'x' || readPath[strlen(readPath) - 3] != 't' || readPath[strlen(readPath) -4] != '.') {
+					error(14);
+				}
 				if (readAttributes[0] || readAttributes[1]) {
 					error(2);//duplicated read file
 				}
@@ -183,5 +187,6 @@ int main(int argc, char * argv[]) {
 	core->gen_chain_word(words, len, result, 'a', tail, false);
 	core->gen_chain_word(words, len, result, head, 'z', false);*/
 	//getchar();
+
 	return 0;
 }
