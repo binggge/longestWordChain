@@ -131,7 +131,7 @@ int Core::createMapChar(char * words[], int len)
 		bool flag = false;
 		for (int j = 0; j < wordNum; j++) {
 			if (wordNode[j].startChar == startChar && wordNode[j].endChar == endChar) {
-				if (strlen(wordNode[j].word) < curlen)
+				if ((int)strlen(wordNode[j].word) < curlen)
 				{
 					wordNode[j].word = currentWord;
 					reachDistance[endChar - 'a'][startChar - 'a'] = curlen;
@@ -564,7 +564,7 @@ int Core::gen_chain_char(char * words[], int len, char * result[], char head, ch
 			resultTails[1] = '\0';
 		}
 		int length = 0;
-		for (int i = 0; i < strlen(resultTails); i++)
+		for (int i = 0; i < (int)strlen(resultTails); i++)
 		{
 			bfs_gcc_no_r(resultTails[i]);
 			int maxi = -1; 
@@ -597,7 +597,7 @@ int Core::gen_chain_char(char * words[], int len, char * result[], char head, ch
 			resultTails[1] = '\0';
 		}
 		int length = 0;
-		for (int i = 0; i < strlen(resultTails); i++)
+		for (int i = 0; i < (int)strlen(resultTails); i++)
 		{
 			dfs_gcc_r(0, resultTails[i], route, head);//这里我们直接把路径保存到类变量里，走新的尾时不需要清除上次走的最长路径。
 		}
