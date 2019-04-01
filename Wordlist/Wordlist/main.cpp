@@ -170,18 +170,7 @@ int main(int argc, char * argv[]) {
 			i++;
 		}
 		fout.close();
-		core->gen_chain_char(words, len, result, 0, 0, false);
-		core->gen_chain_char(words, len, result, 0, 0, true);
-		core->gen_chain_word(words, len, result, 0, 0, false);
-		core->gen_chain_word(words, len, result, 0, 0, true);
-		core->gen_chain_word(words, len, result, 'e', 0, true);
-		core->gen_chain_word(words, len, result, 0,'d', true);
-		core->gen_chain_word(words, len, result, 'e', 0, false);
-		core->gen_chain_word(words, len, result, 0,'d', false);
-		core->gen_chain_char(words, len, result, 'e', 0, true);
-		core->gen_chain_char(words, len, result, 0, 'd', true);
-		core->gen_chain_char(words, len, result, 'e', 0, false);
-		core->gen_chain_char(words, len, result, 0, 'd', false);
+
 	}
 	catch (const char* msg) {
 		printf("%s", msg);
