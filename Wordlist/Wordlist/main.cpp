@@ -69,9 +69,9 @@ int main(int argc, char * argv[]) {
 				posInArgc++;
 				char * readPath = argv[posInArgc];
 				posInArgc++;
-				if (readPath[strlen(readPath)-1] != 't' || readPath[strlen(readPath) - 2] != 'x' || readPath[strlen(readPath) - 3] != 't' || readPath[strlen(readPath) -4] != '.') {
+				/*if (readPath[strlen(readPath)-1] != 't' || readPath[strlen(readPath) - 2] != 'x' || readPath[strlen(readPath) - 3] != 't' || readPath[strlen(readPath) -4] != '.') {
 					error(14);
-				}
+				}*/
 				if (readAttributes[0] || readAttributes[1]) {
 					error(2);//duplicated read file
 				}
@@ -170,6 +170,18 @@ int main(int argc, char * argv[]) {
 			i++;
 		}
 		fout.close();
+		core->gen_chain_char(words, len, result, 0, 0, false);
+		core->gen_chain_char(words, len, result, 0, 0, true);
+		core->gen_chain_word(words, len, result, 0, 0, false);
+		core->gen_chain_word(words, len, result, 0, 0, true);
+		core->gen_chain_word(words, len, result, 'e', 0, true);
+		core->gen_chain_word(words, len, result, 0,'d', true);
+		core->gen_chain_word(words, len, result, 'e', 0, false);
+		core->gen_chain_word(words, len, result, 0,'d', false);
+		core->gen_chain_char(words, len, result, 'e', 0, true);
+		core->gen_chain_char(words, len, result, 0, 'd', true);
+		core->gen_chain_char(words, len, result, 'e', 0, false);
+		core->gen_chain_char(words, len, result, 0, 'd', false);
 	}
 	catch (const char* msg) {
 		printf("%s", msg);
@@ -187,6 +199,6 @@ int main(int argc, char * argv[]) {
 	core->gen_chain_word(words, len, result, 'a', tail, false);
 	core->gen_chain_word(words, len, result, head, 'z', false);*/
 	//getchar();
-
+	
 	return 0;
 }
